@@ -3,7 +3,7 @@ import * as ecs from "@pulumi/aws/ecs";
 import * as aws from "@pulumi/aws";
 import * as networking from "./networking";
 import { executionRole } from "./roles";
-import * as dns from "./dnsRecords";
+import * as dnsRecods from "./dnsRecords";
 
 const config = new pulumi.Config();
 const project = config.get("project");
@@ -73,4 +73,4 @@ new aws.ecs.Service(`${project}-${env}-service`, {
 });
 
 // Export the load balancer's address so that it's easy to access.
-export const url = dns.route53Record.fqdn;
+export const url = dnsRecods.route53Record.fqdn;
