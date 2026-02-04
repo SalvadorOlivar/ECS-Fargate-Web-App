@@ -2,4 +2,5 @@ encryptionsalt: v1:5u5bK4IT0ZU=:v1:YRTOQdDm9mtv1PQK:ZEeYPBnTEH7feW3POI6vTECVAAb4
 config:
   project: pulumi
   aws:region: us-east-1
+  dnsName: sandbox.pormel.tech
 

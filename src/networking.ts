@@ -1,6 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
+import { certificate } from "./acm";
 
 const config = new pulumi.Config();
 const project = config.get("project");
@@ -34,7 +35,7 @@ export const Alb = new aws.lb.LoadBalancer(`${project}-${env}-lb`, {
     loadBalancerType: "application",
     securityGroups: [AlbSg.id],
     subnets: vpc.publicSubnetIds,
-    enableDeletionProtection: true,
+    enableDeletionProtection: false,
     tags: {
         Environment: `${env}`,
         Project: `${project}`,
@@ -52,8 +53,9 @@ export const targetGroup = new aws.lb.TargetGroup(`${project}-${env}-target-grou
 
 export const listener = new aws.lb.Listener(`${project}-${env}-listener`, {
     loadBalancerArn: Alb.arn,
-    port: 80,
-    protocol: "HTTP",
+    port: 443,
+    protocol: "HTTPS",
+    certificateArn: certificate.then(c => c.arn),
     defaultActions: [{
         type: "forward",
         targetGroupArn: targetGroup.arn,

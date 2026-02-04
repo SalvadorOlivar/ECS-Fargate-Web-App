@@ -2,21 +2,14 @@ import * as pulumi from "@pulumi/pulumi";
 import * as ecs from "@pulumi/aws/ecs";
 import * as aws from "@pulumi/aws";
 import * as networking from "./networking";
+import { executionRole } from "./roles";
+import * as dns from "./dnsRecords";
 
 const config = new pulumi.Config();
 const project = config.get("project");
 const env = pulumi.getStack();
 
 const cluster = new ecs.Cluster(`${project}-${env}-cluster`);
-
-const executionRole = new aws.iam.Role(`${project}-${env}-ecs-execution-role`, {
-    assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal({ Service: "ecs-tasks.amazonaws.com" }),
-});
-
-new aws.iam.RolePolicyAttachment(`${project}-${env}-ecs-execution-policy`, {
-    role: executionRole.name,
-    policyArn: "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
-});
 
 const taskDefinition = new ecs.TaskDefinition(`${project}-${env}-task-definition`, {
   family: `${project}-${env}-task-definition-nginx`,
@@ -80,4 +73,4 @@ new aws.ecs.Service(`${project}-${env}-service`, {
 });
 
 // Export the load balancer's address so that it's easy to access.
-export const url = networking.Alb.dnsName;
+export const url = dns.route53Record.fqdn;
