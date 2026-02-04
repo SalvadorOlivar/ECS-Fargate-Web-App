@@ -45,7 +45,7 @@ export const Alb = new aws.lb.LoadBalancer(`${project}-${env}-lb`, {
 
 export const targetGroup = new aws.lb.TargetGroup(`${project}-${env}-target-group`, {
     name: `${project}-${env}-target-group`,
-    port: 80,
+    port: 3000,
     protocol: "HTTP",
     vpcId: vpc.vpcId,
     targetType: "ip",
