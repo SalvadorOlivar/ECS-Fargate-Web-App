@@ -5,27 +5,35 @@ import * as networking from "./networking";
 import { executionRole } from "./roles";
 import * as dnsRecods from "./dnsRecords";
 
-const config = new pulumi.Config();
-const project = config.get("project");
-const env = pulumi.getStack();
+const config            = new pulumi.Config();
+const project           = config.get("project");
+const env               = pulumi.getStack();
+const appPort           = config.getNumber("appPort") || 3000;
+const appDesiredCount   = config.getNumber("appDesiredCount");
+const appName           = config.get("appName");
+const serviceLaunchType = config.get("serviceLaunchType") || "FARGATE";
+const appCpu            = config.get("appCpu");
+const appMemory         = config.get("appMemory");
+const appNetworkMode    = config.get("appNetworkMode") || "awsvpc";
+const appRepository     = config.get("appRepository");
 
 const cluster = new ecs.Cluster(`${project}-${env}-cluster`);
 
 const taskDefinition = new ecs.TaskDefinition(`${project}-${env}-task-definition`, {
-  family: `${project}-${env}-task-definition-solivar-blog`,
-  requiresCompatibilities: ["FARGATE"],
-  networkMode: "awsvpc",
+  family: `${project}-${env}-task-definition-${appName}`,
+  requiresCompatibilities: [serviceLaunchType],
+  networkMode: appNetworkMode,
   executionRoleArn: executionRole.arn,
-  cpu: "256",
-  memory: "512",
+  cpu: appCpu,
+  memory: appMemory,
   containerDefinitions: JSON.stringify([
     {
-      name: `${project}-${env}-solivar-blog`,
-      image: "homosapiensother/solivar-blog:main",
+      name: `${project}-${env}-${appName}`,
+      image: `${appRepository}/${appName}:main`,
       essential: true,
       portMappings: [{
-        containerPort: 3000,
-        hostPort: 3000,
+        containerPort: appPort,
+        hostPort: appPort,
       }],
     }
   ])
@@ -43,8 +51,8 @@ const sg = new aws.ec2.SecurityGroup(`${project}-${env}-service-sg`, {
   ],
   ingress: [
     {
-      fromPort: 3000,
-      toPort: 3000,
+      fromPort: appPort,
+      toPort: appPort,
       protocol: "tcp",
       securityGroups: [networking.AlbSg.id],
     },
@@ -55,8 +63,8 @@ new aws.ecs.Service(`${project}-${env}-service`, {
   name: `${project}-${env}-service`,
   cluster: cluster.arn,
   taskDefinition: taskDefinition.arn,
-  desiredCount: 1,
-  launchType: "FARGATE",
+  desiredCount: appDesiredCount,
+  launchType: serviceLaunchType,
 
   networkConfiguration: {
     assignPublicIp: true,
@@ -65,8 +73,8 @@ new aws.ecs.Service(`${project}-${env}-service`, {
   },
   loadBalancers: [{
     targetGroupArn: networking.targetGroup.arn,
-    containerName: `${project}-${env}-solivar-blog`,
-    containerPort: 3000,
+    containerName: `${project}-${env}-${appName}`,
+    containerPort: appPort,
   }],
 }, {
   dependsOn: [cluster],

@@ -1,6 +1,20 @@
 encryptionsalt: v1:5u5bK4IT0ZU=:v1:YRTOQdDm9mtv1PQK:ZEeYPBnTEH7feW3POI6vTECVAAb4ag==
 config:
-  project: pulumi
   aws:region: us-east-1
-  dnsName: sandbox.pormel.tech
+  project: pulumi
+
+  appName: solivar-blog
+  appPort: 3000
+  appDesiredCount: 2
+  appCpu: 256
+  appMemory: 512
+  appNetworkMode: awsvpc
+  appRepository: homosapiensother
+  serviceLaunchType: FARGATE
+  
+  dnsName: mydomain.com
+
+  
+  
+
 

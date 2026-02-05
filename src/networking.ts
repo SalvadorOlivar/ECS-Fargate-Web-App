@@ -3,9 +3,10 @@ import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import { certificate } from "./acm";
 
-const config = new pulumi.Config();
+const config  = new pulumi.Config();
+const env     = pulumi.getStack();
 const project = config.get("project");
-const env = pulumi.getStack();
+const appPort = config.getNumber("appPort");
 
 export const vpc = new awsx.ec2.Vpc(`${project}-${env}-vpc`, {cidrBlock: "10.0.0.0/16"});
 
@@ -45,7 +46,7 @@ export const Alb = new aws.lb.LoadBalancer(`${project}-${env}-lb`, {
 
 export const targetGroup = new aws.lb.TargetGroup(`${project}-${env}-target-group`, {
     name: `${project}-${env}-target-group`,
-    port: 3000,
+    port: appPort,
     protocol: "HTTP",
     vpcId: vpc.vpcId,
     targetType: "ip",
