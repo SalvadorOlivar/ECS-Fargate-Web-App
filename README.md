@@ -28,3 +28,7 @@ An ECS Cluster is a logical grouping of tasks or services in Amazon Elastic Cont
 
 An ECS Fargate task definition is a blueprint that specifies how Amazon ECS should run containers on the Fargate launch type. It includes details such as container configurations, resource requirements, networking, and IAM roles. Below are the key components and considerations for creating a task definition for Fargate.
 
+# Arquitecture 
+![Arquitectura](docs/arquitecture.png)
+
+
