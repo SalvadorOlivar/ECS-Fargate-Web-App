@@ -16,6 +16,7 @@ const appCpu            = config.get("appCpu");
 const appMemory         = config.get("appMemory");
 const appNetworkMode    = config.get("appNetworkMode") || "awsvpc";
 const appRepository     = config.get("appRepository");
+const appTag            = config.get("appTag") || "latest";
 
 const cluster = new ecs.Cluster(`${project}-${env}-cluster`);
 
@@ -29,7 +30,7 @@ const taskDefinition = new ecs.TaskDefinition(`${project}-${env}-task-definition
   containerDefinitions: JSON.stringify([
     {
       name: `${project}-${env}-${appName}`,
-      image: `${appRepository}/${appName}:main`,
+      image: `${appRepository}/${appName}:${appTag}`,
       essential: true,
       portMappings: [{
         containerPort: appPort,

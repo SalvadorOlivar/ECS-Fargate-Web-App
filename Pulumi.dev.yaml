@@ -10,11 +10,7 @@ config:
   appMemory: 512
   appNetworkMode: awsvpc
   appRepository: homosapiensother
+  appTag: main-15
   serviceLaunchType: FARGATE
   
   dnsName: mydomain.com
-
-  
-  
-
-

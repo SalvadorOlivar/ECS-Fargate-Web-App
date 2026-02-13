@@ -12,7 +12,7 @@ const zone = aws.route53.getZone({
     privateZone: false,
 });
 
-export const route53Record = new aws.route53.Record("nginx", {
+export const route53Record = new aws.route53.Record("application", {
     zoneId: zone.then(z => z.id),
     name: zone.then(z => `${project}-${env}.${z.name}`),
     type: aws.route53.RecordType.CNAME,
